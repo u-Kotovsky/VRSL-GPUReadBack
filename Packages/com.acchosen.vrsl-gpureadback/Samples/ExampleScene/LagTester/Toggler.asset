@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: Toggler
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 42687a2d570f3b64788c44cf8378040a,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: ca4d6949884a6cd478e52b0a11e0f7ce, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 82e604ffaa223944aaf1ab5c74ca7b0a, type: 3}
@@ -21,7 +20,7 @@ MonoBehaviour:
   compiledVersion: 2
   behaviourSyncMode: 1
   hasInteractEvent: 1
-  scriptID: -1906104926467628689
+  scriptID: 643124326081439306
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 

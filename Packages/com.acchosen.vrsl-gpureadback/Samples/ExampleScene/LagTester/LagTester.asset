@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: LagTester
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 29cb5f59942def2479523a6eb4e52a41,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: e61016c7df3a3a24fbcd80f7ca9a7fc9, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 0788eb97b9d1d4d4c9a148536cdc2a67, type: 3}
@@ -21,7 +20,7 @@ MonoBehaviour:
   compiledVersion: 2
   behaviourSyncMode: 1
   hasInteractEvent: 0
-  scriptID: -8279155152402719377
+  scriptID: 8256332595207866811
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 

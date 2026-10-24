@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: VRSL-ReadBackFunction Udon C# Program Asset
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: c411c50c0ad9b76458ce863f2d3b6611,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: ea5996d05fe4dda47b9dcb16a837b588, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: f1fa6757827faf24f8d1c83276d2553a, type: 3}
@@ -21,7 +20,7 @@ MonoBehaviour:
   compiledVersion: 2
   behaviourSyncMode: 1
   hasInteractEvent: 0
-  scriptID: -5887334489121443136
+  scriptID: 5799737821297726183
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
@@ -122,7 +121,7 @@ MonoBehaviour:
       Data: 7|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: VRSL.VRSL_GPUReadBack, Assembly-CSharp
+      Data: VRSL.GPUReadBack.VRSL_GPUReadBack, VRSL.GPUReadBack
     - Name: 
       Entry: 8
       Data: 
@@ -1334,7 +1333,7 @@ MonoBehaviour:
       Data: 77|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: VRSL.ReadType[], Assembly-CSharp
+      Data: VRSL.GPUReadBack.ReadType[], VRSL.GPUReadBack
     - Name: 
       Entry: 8
       Data: 
@@ -1394,7 +1393,7 @@ MonoBehaviour:
       Data: 81|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: VRSL.AnimationParamType[], Assembly-CSharp
+      Data: VRSL.GPUReadBack.AnimationParamType[], VRSL.GPUReadBack
     - Name: 
       Entry: 8
       Data: 
@@ -1562,7 +1561,7 @@ MonoBehaviour:
       Data: 91|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: VRSL.ValueOutputMethod[], Assembly-CSharp
+      Data: VRSL.GPUReadBack.ValueOutputMethod[], VRSL.GPUReadBack
     - Name: 
       Entry: 8
       Data: 
@@ -2286,7 +2285,7 @@ MonoBehaviour:
       Data: 132|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: VRSL.DataOutputType[], Assembly-CSharp
+      Data: VRSL.GPUReadBack.DataOutputType[], VRSL.GPUReadBack
     - Name: 
       Entry: 8
       Data: 
@@ -3233,7 +3232,7 @@ MonoBehaviour:
       Data: 185|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: VRSL_ReadBackFunction_StringList[], Assembly-CSharp
+      Data: VRSL.GPUReadBack.VRSL_ReadBackFunction_StringList[], VRSL.GPUReadBack
     - Name: 
       Entry: 8
       Data: 

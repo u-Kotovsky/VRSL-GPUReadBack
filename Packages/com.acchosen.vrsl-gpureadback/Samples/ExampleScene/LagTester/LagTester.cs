@@ -1,40 +1,40 @@
-﻿
-using UdonSharp;
-using UnityEngine;
+﻿using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using UdonSharp;
 
-
-namespace VRSL
+namespace VRSL.GPUReadBack.Samples
 {
-[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
-
-public class LagTester : UdonSharpBehaviour
-{
-    //literally all this does is tank your FPS
-    //For testing performance of other scripts under load.
-    void Update()
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+    public class LagTester : UdonSharpBehaviour
     {
-        float[] x = new float[4096];
-        for(int i = 0; i < x.Length; i++)
+        /// <summary>
+        /// literally all this does is tank your FPS
+        /// For testing performance of other scripts under load.
+        /// </summary>
+        /// <returns></returns>
+        private void Update()
         {
-            x[i] = Random.Range(-10000.0f, 10000.0f);
-            x[i] += 45 /2 * 546 -3;
-            x[i] = Random.Range(-10000.0f, 10000.0f);
-            x[i] += 45 /2 * 546 -3;
-            x[i] = Random.Range(-10000.0f, 10000.0f);
-            x[i] += 45 /2 * 546 -3;
-            x[i] = Random.Range(-10000.0f, 10000.0f);
-            x[i] += 45 /2 * 546 -3;
-            x[i] = Random.Range(-10000.0f, 10000.0f);
-            x[i] += 45 /2 * 546 -3;
-            x[i] = Random.Range(-10000.0f, 10000.0f);
-            x[i] += 45 /2 * 546 -3;
-            x[i] = Random.Range(-10000.0f, 10000.0f);
-            x[i] += 45 /2 * 546 -3;
-            x[i] = Random.Range(-10000.0f, 10000.0f);
-            x[i] += 45 /2 * 546 -3;
+            float[] x = new float[4096];
+            for(int i = 0; i < x.Length; i++)
+            {
+                x[i] = Random.Range(-10000.0f, 10000.0f);
+                x[i] += 45 /2 * 546 -3;
+                x[i] = Random.Range(-10000.0f, 10000.0f);
+                x[i] += 45 /2 * 546 -3;
+                x[i] = Random.Range(-10000.0f, 10000.0f);
+                x[i] += 45 /2 * 546 -3;
+                x[i] = Random.Range(-10000.0f, 10000.0f);
+                x[i] += 45 /2 * 546 -3;
+                x[i] = Random.Range(-10000.0f, 10000.0f);
+                x[i] += 45 /2 * 546 -3;
+                x[i] = Random.Range(-10000.0f, 10000.0f);
+                x[i] += 45 /2 * 546 -3;
+                x[i] = Random.Range(-10000.0f, 10000.0f);
+                x[i] += 45 /2 * 546 -3;
+                x[i] = Random.Range(-10000.0f, 10000.0f);
+                x[i] += 45 /2 * 546 -3;
+            }
         }
     }
-}
 }

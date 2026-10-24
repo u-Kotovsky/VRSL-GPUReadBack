@@ -1,19 +1,14 @@
-﻿
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
 using UnityEditor;
 using UdonSharpEditor;
-using VRC.Udon.Common;
-using System.Collections.Immutable;
-using UnityEditor.UIElements;
-using UnityEngine.UIElements;
 #endif
 
-namespace VRSL{
+namespace VRSL.GPUReadBack
+{
     public enum ReadType
     {
         Animation,
@@ -47,7 +42,6 @@ namespace VRSL{
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class VRSL_ReadBackFunction : UdonSharpBehaviour
     {
-
         [SerializeField]
         private float universalSmoothingStrength = 0.5f;
         public VRSL_GPUReadBack reader;
@@ -202,15 +196,14 @@ namespace VRSL{
             rowSize = width / reader.dmxPixelSize;
             rowSizeInv = reader.dmxPixelSize * width;
             totalNumOfPixels = width * height;
-            
-
             //hardoffset = reader.dmxPixelSize == 2 ? 0 : 1;
-
         }
+        
         int IntRemap(int source, int sourceFrom, int sourceTo, int targetFrom, int targetTo)
         {
             return (int) Mathf.Round((float)targetFrom + ((float)source-(float)sourceFrom)*((float)targetTo-(float)targetFrom)/((float)sourceTo-(float)sourceFrom));
         }
+        
         float FloatRemap(float source, float sourceFrom, float sourceTo, float targetFrom, float targetTo)
         {
             return targetFrom + (source-sourceFrom)*(targetTo-targetFrom)/(sourceTo-sourceFrom);
@@ -223,43 +216,50 @@ namespace VRSL{
             index =  Mathf.Clamp(startindex + yOffset + xOffset,0, totalNumOfPixels-1);
             return index;
         }
+        
         public bool _GetBoolData(int index)
         {
             return dataBoolActive[index];
         }
+        
         public int _GetIntData(int index)
         {
             return dataIntActive[index];
         }
+        
         public float _GetFloatData(int index)
         {
             return dataFloatActive[index];
         }
+        
         public string _GetStringData(int index)
         {
             return dataStringActive[index];
         }
+        
         public ParticleSystem _GetParticleSystem(int index)
         {
             return particlesSystems[index];
         }
-        void RunFunctions(int i)
+        
+        private void RunFunctions(int i)
         {
             int rawdata = dmxRawData[i];
-            if(smoothingAmount[i] > 0.0f){
+            if (smoothingAmount[i] > 0.0f){
                 rawdata = (int) Mathf.Lerp(dmxRawData[i], (int) Mathf.SmoothDamp(previousdmxRawData[i], dmxRawData[i], ref dmxRawDataVelocity[i], (reader.updateRate * smoothingSpeed),10000.0f, reader.updateRate), smoothingAmount[i]);
             }            
-            switch(readTypes[i])
+            switch (readTypes[i])
             {
                 case ReadType.Animation:
-                    if(animators[i] == null || animationParamNames[i] == ""){return;}
-                    switch(parameterTypes[i])
+                    if (animators[i] == null || animationParamNames[i] == ""){return;}
+                    switch (parameterTypes[i])
                     {
                         case AnimationParamType.Bool:
-                            if(rawdata >= animationBoolParamsThreshold[i]){
+                            if (rawdata >= animationBoolParamsThreshold[i]){
                                 animationBoolParams[i] = true;
                             }
-                            else{
+                            else
+                            {
                                 animationBoolParams[i] = false;
                             }
                             dataBoolActive[i] = animationBoolParams[i];

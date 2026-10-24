@@ -1,5 +1,4 @@
-﻿
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
@@ -10,12 +9,11 @@ using UnityEditor;
 using UdonSharpEditor;
 #endif
 
-namespace VRSL{
-
+namespace VRSL.GPUReadBack
+{
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class VRSL_GPUReadBack : UdonSharpBehaviour
     {
-        //public bool isVertical;
         public VRSL_ReadBackFunction[] functionReaders;
         public bool extendedUniverseMode;
         public int dmxPixelSize = 8;
@@ -23,14 +21,14 @@ namespace VRSL{
         public float startDelay = 1.0f;
         public Texture texture;
         public TextureFormat textureReadFormat = TextureFormat.RGBAFloat;
-        bool initialize;
+        private bool initialize;
 
         [HideInInspector]
         public Color[] output;
-        float currentTime;
+        private float currentTime;
         // public Color ch1, ch2, ch3;
 
-        void Start()
+        private void Start()
         {
             initialize = false;
             currentTime = 0.0f;
@@ -38,11 +36,11 @@ namespace VRSL{
             SendCustomEventDelayedSeconds("_StartGPUReadback",startDelay);
         }
 
-        void Update()
+        private void Update()
         {
-            if(initialize)
+            if (initialize)
             {
-                if(currentTime >= updateRate)
+                if (currentTime >= updateRate)
                 {
                     _MakeReadBackRequest();
                     currentTime = 0.0f;
@@ -56,7 +54,7 @@ namespace VRSL{
 
         public void _MakeReadBackRequest()
         {
-            VRCAsyncGPUReadback.Request(texture, 0,textureReadFormat, (IUdonEventReceiver)this);
+            VRCAsyncGPUReadback.Request(texture, 0, textureReadFormat, (IUdonEventReceiver)this);
         }
 
         public void _StartGPUReadback()
@@ -84,23 +82,26 @@ namespace VRSL{
             }
         }
     }
+    
     #if !COMPILER_UDONSHARP && UNITY_EDITOR
     [CustomEditor(typeof(VRSL_GPUReadBack))]
     [CanEditMultipleObjects]
     public class VRSL_GPUReadBack_Editor : Editor
     {
         public static Texture logo;
-        public static string ver = "VRSL GPUReadback ver:" + " <b><color=#6a15ce> 1.0</color></b>";
-         SerializedProperty functionReaders;
-        void OnEnable()
+        public static string ver = "VRSL GPUReadback ver: <b><color=#6a15ce> 1.0</color></b>";
+        private SerializedProperty functionReaders;
+        
+        private void OnEnable()
         {
             functionReaders = serializedObject.FindProperty("functionReaders");
             logo = Resources.Load("VRStageLighting-Logo") as Texture;
         }
+        
         public static void DrawLogo()
         {
-            ///GUILayout.BeginArea(new Rect(0,0, Screen.width, Screen.height));
-            // GUILayout.FlexibleSpace();
+            //GUILayout.BeginArea(new Rect(0,0, Screen.width, Screen.height));
+            //GUILayout.FlexibleSpace();
             //GUI.DrawTexture(pos,logo,ScaleMode.ScaleToFit);
             //EditorGUI.DrawPreviewTexture(new Rect(0,0,400,150), logo);
             Vector2 contentOffset = new Vector2(0f, -2f);
@@ -113,9 +114,10 @@ namespace VRSL{
             //GUILayout.Label(logo,style, GUILayout.MaxWidth(500), GUILayout.MaxHeight(200));
             GUI.Box(rect, logo,style);
             //GUILayout.Label(logo);
-            // GUILayout.FlexibleSpace();
+            //GUILayout.FlexibleSpace();
             //GUILayout.EndArea();
         }
+        
         private static Rect DrawShurikenCenteredTitle(string title, Vector2 contentOffset, int HeaderHeight)
         {
             var style = new GUIStyle("ShurikenModuleTitle");
@@ -126,14 +128,15 @@ namespace VRSL{
             style.contentOffset = contentOffset;
             style.alignment = TextAnchor.MiddleCenter;
             var rect = GUILayoutUtility.GetRect(16f, HeaderHeight, style);
-
             GUI.Box(rect, title, style);
             return rect;
         }
+        
         public static void ShurikenHeaderCentered(string title)
         {
             DrawShurikenCenteredTitle(title, new Vector2(0f, -2f), 22);
         }
+        
         public override void OnInspectorGUI()
         {   
             if (UdonSharpGUI.DrawDefaultUdonSharpBehaviourHeader(target)) return;
@@ -143,11 +146,12 @@ namespace VRSL{
             EditorGUI.BeginChangeCheck();
             serializedObject.Update();
             //var reader = (target as VRSL_GPUReadBack);
-            if(GUILayout.Button("Link All ReadBack Function Objects"))
+            if (GUILayout.Button("Link All ReadBack Function Objects"))
             {
-                try{
+                try
+                {
                     VRSL_ReadBackFunction[] x = Object.FindObjectsOfType<VRSL_ReadBackFunction>();
-                    if(x[0] != null)
+                    if (x[0] != null)
                     {
                         functionReaders.arraySize = x.Length;
                         for(int i = 0; i < functionReaders.arraySize; i++)
@@ -156,7 +160,10 @@ namespace VRSL{
                         }
                     }
                 }
-                catch{}
+                catch
+                {
+                    // ignored
+                }
             }
 
             if (EditorGUI.EndChangeCheck())

@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: VRSL_ReadBackFunction_StringList
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 3ac9a5c5768b5ed4699cefae6054615a,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 9244fee33aba6f540b00a3ed6cefa11b, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 6841d3511485e6d4f8fea30868df76ca, type: 3}
@@ -21,7 +20,7 @@ MonoBehaviour:
   compiledVersion: 2
   behaviourSyncMode: 1
   hasInteractEvent: 0
-  scriptID: 5319644492413654067
+  scriptID: 4992044745934190515
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 

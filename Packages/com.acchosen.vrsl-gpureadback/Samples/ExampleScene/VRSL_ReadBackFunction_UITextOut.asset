@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: VRSL_ReadBackFunction_UITextOut
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 1d667a9f455aefc469639673534e3beb,
-    type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 3753a9e37418e194dbd1ff61feb82246, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 2f6eecfd0ad8a0443859fc520712d02a, type: 3}
@@ -21,7 +20,7 @@ MonoBehaviour:
   compiledVersion: 2
   behaviourSyncMode: 1
   hasInteractEvent: 0
-  scriptID: 7855528502315918693
+  scriptID: -2007302795321297564
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
@@ -62,7 +61,7 @@ MonoBehaviour:
       Data: 3|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: VRSL.DataType, Assembly-CSharp
+      Data: VRSL.GPUReadBack.Samples.DataType, VRSL.GPUReadBack.Samples
     - Name: 
       Entry: 8
       Data: 
@@ -122,7 +121,7 @@ MonoBehaviour:
       Data: 7|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: VRSL.VRSL_ReadBackFunction, Assembly-CSharp
+      Data: VRSL.GPUReadBack.VRSL_ReadBackFunction, VRSL.GPUReadBack
     - Name: 
       Entry: 8
       Data: 
