@@ -1,21 +1,20 @@
 {
-    "name": "com.acchosen.vrsl-gpureadback",
-    "displayName": "VR Stage Lighting",
-    "version": "1.1.0",
-    "description": "",
-    "author": {
+  "name": "com.acchosen.vrsl-gpureadback",
+  "displayName": "VRSL-GPUReadBack",
+  "version": "1.1.0",
+  "author": {
     "name": "AcChosen",
-        "url": "https://github.com/AcChosen/VRSL-GPUReadBack"
-    },
-    "gitDependencies": {},
-    "vpmDependencies": {
-        "com.acchosen.vr-stage-lighting": ">=2.8.0"
-    },
-    "legacyFolders": {
-        "Assets\\VRSL Addons\\VRSL-GPUReadBack": ""
-    },
-    "legacyFiles": {},
-    "hideInEditor": false,
-    "license": "MIT",
-    "unity": "2019.4"
+    "url": "https://github.com/AcChosen/VRSL-GPUReadBack"
+  },
+  "gitDependencies": {},
+  "vpmDependencies": {
+    "com.acchosen.vr-stage-lighting": ">=2.8.0"
+  },
+  "legacyFolders": {
+    "Assets\\VRSL Addons\\VRSL-GPUReadBack": ""
+  },
+  "legacyFiles": {},
+  "hideInEditor": false,
+  "license": "MIT",
+  "unity": "2019.4"
 }
