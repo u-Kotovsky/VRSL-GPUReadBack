@@ -8,7 +8,7 @@
   },
   "gitDependencies": {},
   "vpmDependencies": {
-    "com.acchosen.vr-stage-lighting": ">=2.8.0"
+    "com.acchosen.vr-stage-lighting": "^2.8.0"
   },
   "legacyFolders": {
     "Assets\\VRSL Addons\\VRSL-GPUReadBack": ""
