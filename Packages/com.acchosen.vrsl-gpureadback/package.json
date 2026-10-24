@@ -1,7 +1,7 @@
 {
   "name": "com.acchosen.vrsl-gpureadback",
-  "displayName": "VRSL-GPUReadBack",
-  "version": "1.1.0",
+  "displayName": "VRSL - GPUReadBack",
+  "version": "1.1.1",
   "author": {
     "name": "AcChosen",
     "url": "https://github.com/AcChosen/VRSL-GPUReadBack"
