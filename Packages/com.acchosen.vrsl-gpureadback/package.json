@@ -1,14 +1,14 @@
 {
   "name": "com.acchosen.vrsl-gpureadback",
   "displayName": "VRSL - GPUReadBack",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "author": {
     "name": "AcChosen",
     "url": "https://github.com/AcChosen/VRSL-GPUReadBack"
   },
   "gitDependencies": {},
   "vpmDependencies": {
-    "com.acchosen.vr-stage-lighting": "^2.8.0"
+    "com.acchosen.vr-stage-lighting": "^2.8.5"
   },
   "legacyFolders": {
     "Assets\\VRSL Addons\\VRSL-GPUReadBack": ""

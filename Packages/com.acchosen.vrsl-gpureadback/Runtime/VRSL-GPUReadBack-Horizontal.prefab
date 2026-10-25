@@ -60,7 +60,7 @@ MonoBehaviour:
   dmxPixelSize: 8
   updateRate: 0.05
   startDelay: 1
-  texture: {fileID: 8400000, guid: 87c3021d20ea2004cad2ca0d2dd14d07, type: 2}
+  texture: {fileID: 8600000, guid: b0632779d39f9014c932b54d18ad09e8, type: 2}
   textureReadFormat: 20
   output: []
 --- !u!114 &5125584571544461141
