@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using UdonSharp;
 using UnityEngine;
+using UdonSharp;
 using VRC.SDK3.Rendering;
 using VRC.Udon.Common.Interfaces;
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
@@ -36,17 +36,16 @@ namespace VRSL.GPUReadBack
 
         private void Update()
         {
-            if (_initialize)
+            if (!_initialize) return;
+            
+            if (_currentTime >= updateRate)
             {
-                if (_currentTime >= updateRate)
-                {
-                    _MakeReadBackRequest();
-                    _currentTime = 0.0f;
-                }
-                else
-                {
-                    _currentTime += Time.deltaTime;
-                }
+                _MakeReadBackRequest();
+                _currentTime = 0.0f;
+            }
+            else
+            {
+                _currentTime += Time.deltaTime;
             }
         }
 
@@ -60,21 +59,22 @@ namespace VRSL.GPUReadBack
             _initialize = true;
         }
 
-        public void OnAsyncGpuReadbackComplete(VRCAsyncGPUReadbackRequest request)
+        public override void OnAsyncGpuReadbackComplete(VRCAsyncGPUReadbackRequest request)
         {
             if (request.hasError)
             {
-                Debug.LogError("GPU readback error!");
+                Debug.LogError($"VRSL GPU ReadBack error on '{gameObject.name}'!");
                 return;
             }
 
-            bool wasSuccessful = request.TryGetData(output);
-            if (wasSuccessful && functionReaders.Length > 0)
+            if (functionReaders.Length <= 0) return;
+            
+            var wasSuccessful = request.TryGetData(output);
+            if (!wasSuccessful) return;
+            
+            foreach(var readback in functionReaders)
             {
-                foreach(VRSL_ReadBackFunction readback in functionReaders)
-                {
-                    readback.SendCustomEvent(nameof(readback._GetData));
-                }
+                readback.SendCustomEvent(nameof(readback._GetData));
             }
         }
     }
@@ -97,11 +97,11 @@ namespace VRSL.GPUReadBack
         public override void OnInspectorGUI()
         {
             if (UdonSharpGUI.DrawDefaultUdonSharpBehaviourHeader(target)) return;
-            //DrawLogo(); // I'm sorry but it's eating space that can be used wisely
             VRSLStyles.ShurikenHeaderCentered($"UnityEditor: {Application.unityVersion}, " + DisplayVersionText.Replace("{0}", _package.version));
+            
             EditorGUI.BeginChangeCheck();
             serializedObject.Update();
-            //var reader = (target as VRSL_GPUReadBack);
+            
             if (GUILayout.Button("Link All ReadBack Function Objects"))
             {
                 LinkAllReadBackFunctionObjects();
@@ -112,6 +112,7 @@ namespace VRSL.GPUReadBack
                 serializedObject.ApplyModifiedProperties();
                 Repaint();
             }
+            
             DrawDefaultInspector();
         }
 
@@ -120,9 +121,9 @@ namespace VRSL.GPUReadBack
             try
             {
                 var readBackFunctions = Object.FindObjectsOfType<VRSL_ReadBackFunction>();
-                if (!readBackFunctions.All(x => x != null)) return;
+                if (readBackFunctions.All(x => x == null)) return;
                 _functionReaders.arraySize = readBackFunctions.Length;
-                for(int i = 0; i < _functionReaders.arraySize; i++)
+                for(var i = 0; i < _functionReaders.arraySize; i++)
                 {
                     if (readBackFunctions[i] == null)
                     {

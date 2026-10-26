@@ -128,34 +128,32 @@ namespace VRSL.GPUReadBack
         [SerializeField] private float[] floatSmoothingMultiplier = new float[512];
         [SerializeField] private float smoothingSpeed = 0.1f;
 
-        void Start()
+        private void Start()
         {
-            width = (int)universalSmoothingStrength;
             width = reader.texture.width;
             height = reader.texture.height;
 
-            offsetUpBy4Pixels = width * ( (int) Mathf.Clamp(((reader.dmxPixelSize/2) - 1), 1, 10));
+            offsetUpBy4Pixels = width * (int) Mathf.Clamp((reader.dmxPixelSize/2) - 1, 1, 10);
             rowSize = width / reader.dmxPixelSize;
             rowSizeInv = reader.dmxPixelSize * width;
             totalNumOfPixels = width * height;
-            //hardoffset = reader.dmxPixelSize == 2 ? 0 : 1;
         }
         
-        int IntRemap(int source, int sourceFrom, int sourceTo, int targetFrom, int targetTo)
+        private int IntRemap(int source, int sourceFrom, int sourceTo, int targetFrom, int targetTo)
         {
             return (int) Mathf.Round((float)targetFrom + ((float)source-(float)sourceFrom)*((float)targetTo-(float)targetFrom)/((float)sourceTo-(float)sourceFrom));
         }
         
-        float FloatRemap(float source, float sourceFrom, float sourceTo, float targetFrom, float targetTo)
+        private float FloatRemap(float source, float sourceFrom, float sourceTo, float targetFrom, float targetTo)
         {
             return targetFrom + (source-sourceFrom)*(targetTo-targetFrom)/(sourceTo-sourceFrom);
         }
 
-        int GetIndex(int startindex, int i, out int index, out int xOffset, out int yOffset)
+        private int GetIndex(int startIndex, int i, out int index, out int xOffset, out int yOffset)
         {
-            xOffset = ((dmxChannels[i]-1) % (rowSize)) * reader.dmxPixelSize;
-            yOffset = (((dmxChannels[i]-1) / (rowSize)) * (rowSizeInv));
-            index =  Mathf.Clamp(startindex + yOffset + xOffset,0, totalNumOfPixels-1);
+            xOffset = ((dmxChannels[i]-1) % rowSize) * reader.dmxPixelSize;
+            yOffset = ((dmxChannels[i]-1) / rowSize) * rowSizeInv;
+            index =  Mathf.Clamp(startIndex + yOffset + xOffset,0, totalNumOfPixels-1);
             return index;
         }
         
@@ -186,12 +184,10 @@ namespace VRSL.GPUReadBack
 
         #region Functions
         
-        private void RunFunctions(int dataPoint, int dmxOffset)
+        private void RunFunctions(int dataPoint)
         {
-            // We just read normal dmx value, do not try to read neighbours!!!!
-            var dataPointIndex = dataPoint;////dmxOffset;
+            var dataPointIndex = dataPoint;
             var rawData = dmxRawData[dataPointIndex];
-            //Debug.Log($"{dataPoint}.{dmxOffset}: {rawData}");
             
             if (smoothingAmount[dataPointIndex] > 0.0f)
             {
@@ -233,7 +229,7 @@ namespace VRSL.GPUReadBack
 
         private void ReadAnimation(int i, float rawData)
         {
-            if (animators[i] == null || animationParamNames[i] == "")
+            if (animators[i] == null || animationParamNames[i] == string.Empty)
             {
                 return;
             }
@@ -283,16 +279,17 @@ namespace VRSL.GPUReadBack
                             }
                         }
                     }
-                    else if(animationRangeToggle[i] == ValueOutputMethod.Range){
+                    else if(animationRangeToggle[i] == ValueOutputMethod.Range)
+                    {
                         float valf = FloatRemap(rawData, 0.0f, 255.0f, animationIntParamsRangeX[i], animationIntParamsRangeY[i]);
                         int val = Mathf.RoundToInt(valf);
                         //Debug.Log("Updated Intf With Range: " + rawdata);
                         //Debug.Log("Updated Int at Index With Range: " + valf);
-                        if(animators[i].GetInteger(animationParamNames[i]) != val)
+                        if (animators[i].GetInteger(animationParamNames[i]) != val)
                         {
                             animators[i].SetInteger(animationParamNames[i], val);
                             dataIntActive[i] = val;
-                            if(dataUseEvent[i])
+                            if (dataUseEvent[i])
                             {
                                 targetFunctions[i].SendCustomEvent(eventNames[i]);
                             }
@@ -300,17 +297,16 @@ namespace VRSL.GPUReadBack
                     }
                     break;
                 case AnimationParamType.Float:
-                    if(animationRangeToggle[i] == ValueOutputMethod.Value)
+                    if (animationRangeToggle[i] == ValueOutputMethod.Value)
                     {
-                        float previousData = dataFloatActive[i];
-                        if(rawData >= animationFloatParamsThreshold[i])
+                        var previousData = dataFloatActive[i];
+                        if (rawData >= animationFloatParamsThreshold[i])
                         {
-                            //if(animators[i].GetFloat(animationParamNames[i]) != animationFloatParams[i])
-                            if(!Mathf.Approximately(animators[i].GetFloat(animationParamNames[i]), animationFloatParams[i]))
+                            if (!Mathf.Approximately(animators[i].GetFloat(animationParamNames[i]), animationFloatParams[i]))
                             {
                                 animators[i].SetFloat(animationParamNames[i], animationFloatParams[i]);
                                 dataFloatActive[i] = animationFloatParams[i];
-                                if(dataUseEvent[i])
+                                if (dataUseEvent[i])
                                 {
                                     targetFunctions[i].SendCustomEvent(eventNames[i]);
                                 }
@@ -318,11 +314,11 @@ namespace VRSL.GPUReadBack
                         }
                         else
                         {
-                            if(animators[i].GetFloat(animationParamNames[i]) != 0.0f)
+                            if (animators[i].GetFloat(animationParamNames[i]) != 0.0f)
                             {
                                 animators[i].SetFloat(animationParamNames[i], 0.0f);
                                 dataFloatActive[i] = 0.0f;
-                                if(dataUseEvent[i])
+                                if (dataUseEvent[i])
                                 {
                                     targetFunctions[i].SendCustomEvent(eventNames[i]);
                                 }
@@ -330,13 +326,12 @@ namespace VRSL.GPUReadBack
                         }
                         previousDataFloatActive[i] = previousData;
                     }
-                    else if(animationRangeToggle[i] == ValueOutputMethod.Range)
+                    else if (animationRangeToggle[i] == ValueOutputMethod.Range)
                     {
-                        float previousData = dataFloatActive[i];
-                        float val = FloatRemap(rawData, 0.0f, 255.0f, animationFloatParamsRange[i].x, animationFloatParamsRange[i].y);
+                        var previousData = dataFloatActive[i];
+                        var val = FloatRemap(rawData, 0.0f, 255.0f, animationFloatParamsRange[i].x, animationFloatParamsRange[i].y);
                         
-                        //if(animators[i].GetFloat(animationParamNames[i]) != val)
-                        if(!Mathf.Approximately(animators[i].GetFloat(animationParamNames[i]), val))
+                        if (!Mathf.Approximately(animators[i].GetFloat(animationParamNames[i]), val))
                         {
                             if (floatSmoothingToggle[i])
                             {
@@ -357,11 +352,11 @@ namespace VRSL.GPUReadBack
                     }
                     break;
                 case AnimationParamType.Trigger:
-                    if(!animationTriggerReset[i] && rawData >= animationTriggerParamsThreshold[i])
+                    if (!animationTriggerReset[i] && rawData >= animationTriggerParamsThreshold[i])
                     {
                         animators[i].SetTrigger(animationParamNames[i]);
                         animationTriggerReset[i] = true;
-                        if(dataUseEvent[i])
+                        if (dataUseEvent[i])
                         {
                             targetFunctions[i].SendCustomEvent(eventNames[i]);
                         }
@@ -386,9 +381,9 @@ namespace VRSL.GPUReadBack
                 return;
             }
             
-            if(particlesSystemsOneShotToggle[i])
+            if (particlesSystemsOneShotToggle[i])
             {
-                if(!particlesSystemsOneShotReset[i] && rawData >= particlesSystemsThreshold[i])
+                if (!particlesSystemsOneShotReset[i] && rawData >= particlesSystemsThreshold[i])
                 {
                     particlesSystems[i].Play();
                     particlesSystemsOneShotReset[i] = true;
@@ -401,7 +396,7 @@ namespace VRSL.GPUReadBack
                 {
                     particlesSystemsOneShotReset[i] = false;
                 }
-                else if(particlesSystems[i].isPlaying)
+                else if (particlesSystems[i].isPlaying)
                 {
                     particlesSystems[i].Stop();
                 }
@@ -409,20 +404,19 @@ namespace VRSL.GPUReadBack
             }
             else
             {
-                // if(dataIntActive[i] != rawdata){
-                    if(rawData >= particlesSystemsThreshold[i])
-                    {
-                        particlesSystems[i].Play();
-                    }
-                    else if(particlesSystems[i].isPlaying)
-                    {
-                        particlesSystems[i].Stop();
-                    }
-                    
-                dataBoolActive[i] = rawData >= particlesSystemsThreshold[i];
-                if(dataBoolActive[i] != dataBoolsPrevious[i])
+                if (rawData >= particlesSystemsThreshold[i])
                 {
-                    if(dataUseEvent[i])
+                    particlesSystems[i].Play();
+                }
+                else if (particlesSystems[i].isPlaying)
+                {
+                    particlesSystems[i].Stop();
+                }
+                
+                dataBoolActive[i] = rawData >= particlesSystemsThreshold[i];
+                if (dataBoolActive[i] != dataBoolsPrevious[i])
+                {
+                    if (dataUseEvent[i])
                     {
                         targetFunctions[i].SendCustomEvent(eventNames[i]);
                     }
@@ -433,18 +427,18 @@ namespace VRSL.GPUReadBack
 
         private void ReadEvent(int i, float rawData)
         {
-            if (targetFunctions[i] == null || eventNames[i] == "")
+            if (targetFunctions[i] == null || eventNames[i] == string.Empty)
             {
                 return;
             }
             
-            if(eventSpamToggle[i])
+            if (eventSpamToggle[i])
             {
                 eventFireReset[i] = false;
-                if(eventSpamDelay[i] > 0.0f)
+                if (eventSpamDelay[i] > 0.0f)
                 {
                     eventFireTimer[i] += Time.deltaTime;
-                    if(eventFireTimer[i] >= eventSpamDelay[i] && rawData >= eventCallThreshold[i])
+                    if (eventFireTimer[i] >= eventSpamDelay[i] && rawData >= eventCallThreshold[i])
                     {
                         eventFireTimer[i] = 0.0f;
                         targetFunctions[i].SendCustomEvent(eventNames[i]);
@@ -452,7 +446,7 @@ namespace VRSL.GPUReadBack
                 }
                 else
                 {
-                    if(rawData >= eventCallThreshold[i])
+                    if (rawData >= eventCallThreshold[i])
                     {
                         targetFunctions[i].SendCustomEvent(eventNames[i]);
                     }
@@ -460,12 +454,12 @@ namespace VRSL.GPUReadBack
             }
             else
             {
-                if(eventFireReset[i] == false && rawData >= eventCallThreshold[i])
+                if (!eventFireReset[i] && rawData >= eventCallThreshold[i])
                 {
                     targetFunctions[i].SendCustomEvent(eventNames[i]);
                     eventFireReset[i] = true;
                 }
-                else if (eventFireReset[i] == true && rawData <= eventFireResetThreshold[i])
+                else if (eventFireReset[i] && rawData <= eventFireResetThreshold[i])
                 {
                     eventFireReset[i] = false;
                 }
@@ -475,33 +469,38 @@ namespace VRSL.GPUReadBack
 
         private void ReadObjectToggle(int i, float rawData)
         {
-            if(toggleGameobjects[i] == null){return;}
+            if (toggleGameobjects[i] == null)
+            {
+                return;
+            }
+            
             if(invertToggle[i])
             {
-                if(rawData >= eventCallThreshold[i] && toggleGameobjects[i].activeSelf == true)
+                if(rawData >= eventCallThreshold[i] && toggleGameobjects[i].activeSelf)
                 {
                     toggleGameobjects[i].SetActive(false);
                 }
-                else if(rawData < eventCallThreshold[i] && toggleGameobjects[i].activeSelf == false)
+                else if(rawData < eventCallThreshold[i] && !toggleGameobjects[i].activeSelf)
                 {
                     toggleGameobjects[i].SetActive(true);
                 }
             }
             else
             {
-                if(rawData >= eventCallThreshold[i] && toggleGameobjects[i].activeSelf == false)
+                if (rawData >= eventCallThreshold[i] && !toggleGameobjects[i].activeSelf)
                 {
                     toggleGameobjects[i].SetActive(true);
                 }
-                else if(rawData < eventCallThreshold[i] && toggleGameobjects[i].activeSelf == true)
+                else if(rawData < eventCallThreshold[i] && toggleGameobjects[i].activeSelf)
                 {
                     toggleGameobjects[i].SetActive(false);
                 }
             }
             dataBoolActive[i] = toggleGameobjects[i].activeSelf;
-            if(dataBoolActive[i] != dataBoolsPrevious[i])
+            if (dataBoolActive[i] != dataBoolsPrevious[i])
             {
-                if(dataUseEvent[i] == true){
+                if (dataUseEvent[i])
+                {
                     targetFunctions[i].SendCustomEvent(eventNames[i]);
                 }
             }
@@ -523,7 +522,7 @@ namespace VRSL.GPUReadBack
                     {
                         dataBoolsPrevious[i] = dataBools[i];
                         dataBoolActive[i] = dataBools[i];
-                        if(dataUseEvent[i])
+                        if (dataUseEvent[i])
                         {
                             targetFunctions[i].SendCustomEvent(eventNames[i]);
                         }
@@ -532,57 +531,53 @@ namespace VRSL.GPUReadBack
                 case DataOutputType.Int:
                     if(animationRangeToggle[i] == ValueOutputMethod.Value)
                     {
-                        // if(dataUseEvent[i] == true)
-                        // {
-                            if(rawData >= dataIntThreshold[i])
-                            {     
-                                if(!eventFireReset[i] && dataUseEvent[i])
-                                {
-                                    targetFunctions[i].SendCustomEvent(eventNames[i]);
-                                    eventFireReset[i] = true;
-                                }
-                                //Debug.Log("Activating Value!");
-                                dataIntActive[i] = dataInts[i];
-                            }
-                            else if(rawData <= dataIntThreshold[i])
+                        if(rawData >= dataIntThreshold[i])
+                        {     
+                            if (!eventFireReset[i] && dataUseEvent[i])
                             {
-                                if (eventFireReset[i] && dataUseEvent[i])
-                                {
-                                    eventFireReset[i] = false;
-                                }
-                                dataIntActive[i] = 0;
-                                //Debug.Log("Deactivating Value!");
+                                targetFunctions[i].SendCustomEvent(eventNames[i]);
+                                eventFireReset[i] = true;
                             }
-                        // }
+                            //Debug.Log("Activating Value!");
+                            dataIntActive[i] = dataInts[i];
+                        }
+                        else if(rawData <= dataIntThreshold[i])
+                        {
+                            if (eventFireReset[i] && dataUseEvent[i])
+                            {
+                                eventFireReset[i] = false;
+                            }
+                            dataIntActive[i] = 0;
+                            //Debug.Log("Deactivating Value!");
+                        }
                     }
                     else
                     {
-                        int val = IntRemap((int)rawData,0,255,dataIntRangeX[i],dataIntRangeY[i]);
-                        //Debug.Log("Current Value: " + val.ToString());
-                        if(val != dataIntsPrevious[i])
+                        var val = IntRemap((int)rawData,0,255,dataIntRangeX[i],dataIntRangeY[i]);
+                        
+                        if (val != dataIntsPrevious[i])
                         {
                             dataInts[i] = val;
                             dataIntsPrevious[i] = val;
                             dataIntActive[i] = val;
-                            //Debug.Log(dataIntActive[i]);
-                            if(dataUseEvent[i])
+                            
+                            if (dataUseEvent[i])
                             {
                                 var delta = Mathf.Abs(rawData - previousdmxRawData[i]);
-                                if(delta > dataInterpolationTolerance[i])
+                                if (delta > dataInterpolationTolerance[i])
                                 {
                                     targetFunctions[i].SendCustomEvent(eventNames[i]);
                                 }
-
                             }
                         }
                     }
                     break;
                 case DataOutputType.Float:
-                    if(animationRangeToggle[i] == ValueOutputMethod.Value)
+                    if (animationRangeToggle[i] == ValueOutputMethod.Value)
                     {
-                        float previousData = dataFloatActive[i];
+                        var previousData = dataFloatActive[i];
                         
-                        // if(dataUseEvent[i] == true)
+                        // if(dataUseEvent[i])
                         // {
                             if (rawData >= dataFloatThreshold[i])
                             {     
@@ -606,9 +601,9 @@ namespace VRSL.GPUReadBack
                     }
                     else
                     {
-                        float previousData = dataFloatActive[i];
-                        float val = FloatRemap(rawData, 0.0f, 255.0f, dataFloatRange[i].x, dataFloatRange[i].y);
-                        //if (val != dataFloatsPrevious[i])
+                        var previousData = dataFloatActive[i];
+                        var val = FloatRemap(rawData, 0.0f, 255.0f, dataFloatRange[i].x, dataFloatRange[i].y);
+                        
                         if (!Mathf.Approximately(val, dataFloatsPrevious[i]))
                         {
                             if (floatSmoothingToggle[i])
@@ -623,6 +618,7 @@ namespace VRSL.GPUReadBack
                                 dataFloatsPrevious[i] = val;
                                 dataFloatActive[i] = val; 
                             }
+                            
                             if (dataUseEvent[i])
                             {
                                 var delta = Mathf.Abs(rawData - previousdmxRawData[i]);
@@ -636,15 +632,15 @@ namespace VRSL.GPUReadBack
                     }
                     break;
                 case DataOutputType.String:
-                    int valIndex = IntRemap((int)rawData,0,255,dataStringRangeX[i],dataStringRangeY[i]);
-                    string newString = dataStringList[i].stringList[valIndex];
-                    if(dataUseEvent[i] && dataStringActive[i] != newString)
+                    var valIndex = IntRemap((int)rawData,0,255,dataStringRangeX[i],dataStringRangeY[i]);
+                    var newString = dataStringList[i].stringList[valIndex];
+                    
+                    if (dataUseEvent[i] && dataStringActive[i] != newString)
                     {
                         dataStringActive[i] = newString;
-                        if(dataInterpolationTolerance[i] == 0)
+                        if (dataInterpolationTolerance[i] == 0)
                         {
                             targetFunctions[i].SendCustomEvent(eventNames[i]);
-                            //Debug.Log("Current String: " + dataStringActive[i]);
                         }
                         else
                         {
@@ -665,59 +661,27 @@ namespace VRSL.GPUReadBack
 
         private void ReadTransform(int i, float rawData)
         {
-            
+            // TODO: transform readings
         }
 
         #endregion
         
         public void _GetData()
         {
-            // We just read normal dmx value, do not try to read neighbours!!!!
-            Color[] pixelData = reader.output;
-            
-            // TODO: redo this into mathematical formula
-            // TODO: redo this thing to read converted texture (128x128, left top -> left bottom -> Left top + 1 and so on.)
-
-            // goes through all DataPoints and only writes DMX values to them
-            // an idea is to have a length so that we can fill with more data in one DataPoint
-            // that will let us use "fine", "coarse" channels, and integrate Vector3&Quaternion 
-            // into this
-
-            var lastIndex = 0;
+            var pixelData = reader.output;
             
             for (var dataPointIndex = 0; dataPointIndex < size; dataPointIndex++)
             {
-                //var startIndex = 0;
-                //startIndex = (reader.dmxPixelSize) + offsetUpBy4Pixels;
-                //var pixelIndex = GetIndex(startIndex, i, out index, out xOffset, out yOffset);
                 var pixelIndex = GetGlobalChannel(dmxUnviverses[dataPointIndex], dmxChannels[dataPointIndex]);
-                //((dmxUnviverses[dataPointIndex] - 1) * 512) + dmxChannels[dataPointIndex] - 1;
-                /*var length = dmxChannelLength[dataPointIndex]; // this is DMX channels used after pixel index (inclusive)
-                for (int j = 0; j < length; j++)
+                
+                dmxRawData[dataPointIndex] = Mathf.RoundToInt(pixelData[pixelIndex].r * 255.0f);
+                
+                RunFunctions(dataPointIndex);
+                /*if (reader.isInterpolated)
                 {
-                    var dmxOffset = lastIndex;
-                    dmxRawData[dmxOffset] = Mathf.RoundToInt(pixelData[pixelIndex + j].r * 255.0f);
-                    RunFunctions(dataPointIndex, dmxOffset);
-                    lastIndex++;
+                    dmxRawData[i+1] = Mathf.RoundToInt(pixelData[GetIndex(startindex, i+1, out index, out xOffset, out yOffset)].r * 255.0f);
                 }*/
-                
-                var dmxOffset = lastIndex;
-                dmxRawData[dmxOffset] = Mathf.RoundToInt(pixelData[pixelIndex].r * 255.0f);
-                RunFunctions(dataPointIndex, dmxOffset);
-                //lastIndex++;
-
-                //lastIndex = dataPointIndex + length; // write last index so we do not override values
-                
-                //dmxRawData[i] = Mathf.RoundToInt(pixelData[pixelIndex].r * 255.0f);
-                // if(reader.isInterpolated) {dmxRawData[i+1] = Mathf.RoundToInt((pixelData[GetIndex(startindex, i+1, out index, out xOffset, out yOffset)].r) * 255.0f);}
-                //RunFunctions(i);
             }
-            
-            /*for (var i = 0; i < pixelData.Length; i++)
-            {
-                var color = pixelData[i];
-                if (color.r != 0) Debug.Log($"COLOR: {i} {color}");
-            }*/
         }
         
         private int GetGlobalChannel(int universe, int channel)
@@ -741,8 +705,6 @@ namespace VRSL.GPUReadBack
         private SerializedProperty dataTypes, dataBools, dataBoolsThreshold, dataInts, dataIntThreshold, dataIntRangeX, dataIntRangeY, dataFloats, dataFloatThreshold, dataFloatRange, dataStringList, dataStringRangeX, dataStringRangeY, dataUseEvent;
         private SerializedProperty dataFoldout, particlesSystemsOneShotToggle, particlesSystemsOneShotReset, particlesSystemsOneShotResetThreshold, universalSmoothingStrength;
         private SerializedProperty dataStringActive, dataBoolActive, dataIntActive, dataFloatActive, eventSpamToggle, eventSpamDelay, eventFireReset, eventFireResetThreshold, animationTriggerReset, animationTriggerResetThreshold, animationTriggerParamsThreshold;
-        
-        // TODO: for some reason dmxRawValue is not valid (size: 0)
         
         private void OnEnable()
         {
@@ -829,16 +791,18 @@ namespace VRSL.GPUReadBack
             return false;
         }
 
-        public void DrawElement(int index, VRSL_ReadBackFunction targetScript)
+        private void DrawElement(int index, VRSL_ReadBackFunction targetScript)
         {
-            //EditorGUILayout.LabelField("Data Point #" + index, Title());
-            EditorGUILayout.Space(5);
             EditorGUILayout.BeginVertical("box");
+            
+            // TODO: simplify channel length via bit masks instead
             dmxChannelLength.GetArrayElementAtIndex(index).intValue = EditorGUILayout.IntSlider("Channel Length",dmxChannelLength.GetArrayElementAtIndex(index).intValue, 1, 3);
-            dmxUnviverses.GetArrayElementAtIndex(index).intValue = EditorGUILayout.IntSlider("Universe",dmxUnviverses.GetArrayElementAtIndex(index).intValue, 1, 9);
+            
+            dmxUnviverses.GetArrayElementAtIndex(index).intValue = EditorGUILayout.IntSlider("Universe",dmxUnviverses.GetArrayElementAtIndex(index).intValue, 1, 30);
             dmxChannels.GetArrayElementAtIndex(index).intValue = EditorGUILayout.IntSlider("Channel",dmxChannels.GetArrayElementAtIndex(index).intValue, 1, 512);
             
             EditorGUILayout.Space(5);
+            
             smoothingAmount.GetArrayElementAtIndex(index).floatValue = EditorGUILayout.Slider("Smoothing Strength", smoothingAmount.GetArrayElementAtIndex(index).floatValue, 0.0f, 1.0f);
 
             if (EnsureCapacity(dmxRawData, 512))
@@ -846,7 +810,7 @@ namespace VRSL.GPUReadBack
                 serializedObject.ApplyModifiedProperties();
             }
             
-            EditorGUILayout.LabelField("RAW VALUE:", dmxRawData.GetArrayElementAtIndex(index).floatValue.ToString(), VRSLStyles.RawDataStyle(dmxRawData.GetArrayElementAtIndex(index).floatValue));
+            EditorGUILayout.LabelField("Raw Value:", dmxRawData.GetArrayElementAtIndex(index).floatValue.ToString(), VRSLStyles.RawDataStyle(dmxRawData.GetArrayElementAtIndex(index).floatValue));
 
             EditorGUILayout.Space(5);
 
@@ -854,7 +818,7 @@ namespace VRSL.GPUReadBack
             EditorGUILayout.BeginVertical("box");
             switch(readTypes.GetArrayElementAtIndex(index).enumValueIndex)
             {
-                case (int)ReadType.Animation:
+                case (int) ReadType.Animation:
                     EditorGUILayout.PropertyField(animators.GetArrayElementAtIndex(index),VRSLStyles.Label("Animator"));
                     EditorGUILayout.PropertyField(animationParamNames.GetArrayElementAtIndex(index),VRSLStyles.Label("Parameter Name"));
                     EditorGUILayout.PropertyField(parameterTypes.GetArrayElementAtIndex(index),VRSLStyles.Label("Parameter Type"));
@@ -869,17 +833,15 @@ namespace VRSL.GPUReadBack
                         case (int) AnimationParamType.Int:
                             EditorGUILayout.PropertyField(animationRangeToggle.GetArrayElementAtIndex(index),VRSLStyles.Label("Value Method"));
                             EditorGUILayout.BeginVertical("box");
-                            if(animationRangeToggle.GetArrayElementAtIndex(index).enumValueIndex == (int)ValueOutputMethod.Value)
+                            if (animationRangeToggle.GetArrayElementAtIndex(index).enumValueIndex == (int)ValueOutputMethod.Value)
                             {
                                 EditorGUILayout.PropertyField(animationIntParams.GetArrayElementAtIndex(index),VRSLStyles.Label("Integer Value"));
                                 animationIntParamsThreshold.GetArrayElementAtIndex(index).intValue = EditorGUILayout.IntSlider("Activation Threshold",animationIntParamsThreshold.GetArrayElementAtIndex(index).intValue, 0, 255);
                             }
                             else
                             {
-                                //EditorGUILayout.PropertyField(animationIntParamsRange.GetArrayElementAtIndex(index), Label("Integer Range"));
-                                
                                 EditorGUILayout.BeginHorizontal();
-                                float lw = EditorGUIUtility.labelWidth;
+                                var labelWidth = EditorGUIUtility.labelWidth;
                                 EditorGUIUtility.labelWidth = 50.0f;
                                 EditorGUILayout.PropertyField(animationIntParamsRangeX.GetArrayElementAtIndex(index), VRSLStyles.Label("From:"), GUILayout.MaxWidth(100.0f));
                                 //animationIntParamsRangeX.GetArrayElementAtIndex(index).intValue = Mathf.Abs(animationIntParamsRangeX.GetArrayElementAtIndex(index).intValue);
@@ -887,7 +849,7 @@ namespace VRSL.GPUReadBack
                                 GUILayout.Space(100.0f);
                                 EditorGUILayout.PropertyField(animationIntParamsRangeY.GetArrayElementAtIndex(index), VRSLStyles.Label("To:"), GUILayout.MaxWidth(100.0f));
                                 //animationIntParamsRangeY.GetArrayElementAtIndex(index).intValue = Mathf.Abs(animationIntParamsRangeY.GetArrayElementAtIndex(index).intValue);
-                                EditorGUIUtility.labelWidth = lw;
+                                EditorGUIUtility.labelWidth = labelWidth;
                                 EditorGUILayout.EndHorizontal();
                             }
                             EditorGUILayout.LabelField("Value:", dataIntActive.GetArrayElementAtIndex(index).intValue.ToString(), VRSLStyles.IntDataStyle(dataIntActive.GetArrayElementAtIndex(index).intValue)); 
@@ -935,7 +897,7 @@ namespace VRSL.GPUReadBack
                     }
                     EditorGUILayout.EndVertical();
                     break;
-                case (int)ReadType.Event:
+                case (int) ReadType.Event:
                     EditorGUILayout.PropertyField(targetFunctions.GetArrayElementAtIndex(index), VRSLStyles.Label("Target Function"));
                     EditorGUILayout.PropertyField(eventNames.GetArrayElementAtIndex(index), VRSLStyles.Label("Event Name"));
                     eventCallThreshold.GetArrayElementAtIndex(index).intValue = EditorGUILayout.IntSlider("Event Activate Threshold",eventCallThreshold.GetArrayElementAtIndex(index).intValue, 0, 255);
@@ -954,21 +916,18 @@ namespace VRSL.GPUReadBack
                     EditorGUILayout.EndVertical();
                     break;
 
-                case (int)ReadType.ObjectToggle:
+                case (int) ReadType.ObjectToggle:
                     EditorGUILayout.PropertyField(toggleGameobjects.GetArrayElementAtIndex(index), VRSLStyles.Label("Target Object"));
                     eventCallThreshold.GetArrayElementAtIndex(index).intValue = EditorGUILayout.IntSlider("Event Activate Threshold",eventCallThreshold.GetArrayElementAtIndex(index).intValue, 0, 255);
                     EditorGUILayout.PropertyField(invertToggle.GetArrayElementAtIndex(index), VRSLStyles.Label("Invert?"));
-                    try
+                    
+                    var targetObject = (GameObject)toggleGameobjects.GetArrayElementAtIndex(index).objectReferenceValue;
+                    if (targetObject != null)
                     {
-                        GameObject targetObject = (GameObject)toggleGameobjects.GetArrayElementAtIndex(index).objectReferenceValue;
                         EditorGUILayout.LabelField("Value:", targetObject.activeSelf.ToString(),
                             VRSLStyles.BoolDataStyle(targetObject.activeSelf));
                     }
-                    catch (System.Exception e)
-                    {
-                        e.GetType();
-                    }
-                    //EditorGUILayout.EndVertical();
+                    
                     EditorGUILayout.PropertyField(dataUseEvent.GetArrayElementAtIndex(index), VRSLStyles.Label("Send Event On Value Change?"));
                     if (dataUseEvent.GetArrayElementAtIndex(index).boolValue)
                     {
@@ -982,27 +941,26 @@ namespace VRSL.GPUReadBack
                     }
                     break;
                 
-                case (int)ReadType.Particles:
+                case (int) ReadType.Particles:
                     EditorGUILayout.PropertyField(particlesSystems.GetArrayElementAtIndex(index), VRSLStyles.Label("Particle System"));
                     particlesSystemsThreshold.GetArrayElementAtIndex(index).intValue = EditorGUILayout.IntSlider("Activation Threshold",particlesSystemsThreshold.GetArrayElementAtIndex(index).intValue, 0, 255);
-                    try
+                    
+                    var particles = targetScript._GetParticleSystem(index);
+                    if (particles != null)
                     {
-                        ParticleSystem particles = targetScript._GetParticleSystem(index);
                         EditorGUILayout.LabelField("Is Playing: ", particles.isPlaying.ToString(),
                             VRSLStyles.BoolDataStyle(particles.isPlaying));
                     }
-                    catch (System.Exception e)
-                    {
-                        e.GetType();
-                    }
+                    
                     EditorGUILayout.PropertyField(particlesSystemsOneShotToggle.GetArrayElementAtIndex(index), VRSLStyles.Label("One Shot?"));
-                    if(particlesSystemsOneShotToggle.GetArrayElementAtIndex(index).boolValue)
+                    if (particlesSystemsOneShotToggle.GetArrayElementAtIndex(index).boolValue)
                     {
                         EditorGUILayout.BeginVertical("box");
                         EditorGUILayout.LabelField("READY TO FIRE: ", (!particlesSystemsOneShotReset.GetArrayElementAtIndex(index).boolValue).ToString(), VRSLStyles.BoolDataStyle(!(particlesSystemsOneShotReset.GetArrayElementAtIndex(index).boolValue)));
                         particlesSystemsOneShotResetThreshold.GetArrayElementAtIndex(index).intValue = EditorGUILayout.IntSlider("Reset Threshold",particlesSystemsOneShotResetThreshold.GetArrayElementAtIndex(index).intValue, 0, 255);
                         EditorGUILayout.EndVertical();
                     }
+                    
                     EditorGUILayout.PropertyField(dataUseEvent.GetArrayElementAtIndex(index), VRSLStyles.Label("Send Event On Value Change?"));
                     if (dataUseEvent.GetArrayElementAtIndex(index).boolValue)
                     {
@@ -1015,7 +973,7 @@ namespace VRSL.GPUReadBack
                         //EditorGUILayout.PropertyField(eventFireResetThreshold.GetArrayElementAtIndex(index),Label("Reset Event At:"));
                     }
                     break;
-                case (int)ReadType.Data:
+                case (int) ReadType.Data:
                     EditorGUILayout.PropertyField(dataTypes.GetArrayElementAtIndex(index), VRSLStyles.Label("Data Type"));
                     EditorGUILayout.BeginVertical("box");
                     switch(dataTypes.GetArrayElementAtIndex(index).enumValueIndex)
@@ -1036,14 +994,12 @@ namespace VRSL.GPUReadBack
                             else
                             {
                                 EditorGUILayout.BeginHorizontal();
-                                float lw = EditorGUIUtility.labelWidth;
+                                var labelWidth = EditorGUIUtility.labelWidth;
                                 EditorGUIUtility.labelWidth = 50.0f;
                                 EditorGUILayout.PropertyField(dataIntRangeX.GetArrayElementAtIndex(index), VRSLStyles.Label("From:"), GUILayout.MaxWidth(100.0f));
-                                //dataIntRangeX.GetArrayElementAtIndex(index).intValue = Mathf.Abs(dataIntRangeX.GetArrayElementAtIndex(index).intValue);
                                 GUILayout.Space(100.0f);
                                 EditorGUILayout.PropertyField(dataIntRangeY.GetArrayElementAtIndex(index), VRSLStyles.Label("To:"), GUILayout.MaxWidth(100.0f));
-                                //dataIntRangeY.GetArrayElementAtIndex(index).intValue = Mathf.Abs(dataIntRangeY.GetArrayElementAtIndex(index).intValue);
-                                EditorGUIUtility.labelWidth = lw;
+                                EditorGUIUtility.labelWidth = labelWidth;
                                 EditorGUILayout.EndHorizontal();
                             }
                             EditorGUILayout.LabelField("Value:", dataIntActive.GetArrayElementAtIndex(index).intValue.ToString(), VRSLStyles.IntDataStyle(dataIntActive.GetArrayElementAtIndex(index).intValue)); 
@@ -1072,7 +1028,7 @@ namespace VRSL.GPUReadBack
                             targetScript.dataStringList[index] = EditorGUILayout.ObjectField("String List",dataStringList.GetArrayElementAtIndex(index).objectReferenceValue,typeof(VRSL_ReadBackFunction_StringList) ,true) as VRSL_ReadBackFunction_StringList;
                             try
                             {
-                                var editor = Editor.CreateEditor(targetScript.dataStringList[index]);
+                                var editor = CreateEditor(targetScript.dataStringList[index]);
                                 var root = editor.DrawDefaultInspector();
                                 if (root)
                                 {
@@ -1081,7 +1037,7 @@ namespace VRSL.GPUReadBack
 
                                 EditorGUILayout.Space();
                                 EditorGUILayout.BeginHorizontal();
-                                float lw = EditorGUIUtility.labelWidth;
+                                var labelWidth = EditorGUIUtility.labelWidth;
                                 EditorGUIUtility.labelWidth = 100.0f;
                                 EditorGUILayout.PropertyField(dataStringRangeX.GetArrayElementAtIndex(index),
                                     VRSLStyles.Label("Index From:"), GUILayout.MaxWidth(150.0f));
@@ -1094,7 +1050,7 @@ namespace VRSL.GPUReadBack
                                 dataStringRangeY.GetArrayElementAtIndex(index).intValue = Mathf.Clamp(
                                     dataStringRangeY.GetArrayElementAtIndex(index).intValue, 0,
                                     targetScript.dataStringList[index].stringList.Length - 1);
-                                EditorGUIUtility.labelWidth = lw;
+                                EditorGUIUtility.labelWidth = labelWidth;
                                 EditorGUILayout.EndHorizontal();
                                 EditorGUILayout.Space();
                                 EditorGUILayout.LabelField("Value:",
@@ -1103,7 +1059,7 @@ namespace VRSL.GPUReadBack
                             }
                             catch (System.Exception e)
                             {
-                                e.GetType();
+                                Debug.LogException(e);
                             }
                             break;
                     }
@@ -1123,7 +1079,6 @@ namespace VRSL.GPUReadBack
             }
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndVertical();
-            EditorGUILayout.Space(10);
         }
 
         public override void OnInspectorGUI()
@@ -1132,19 +1087,22 @@ namespace VRSL.GPUReadBack
             VRSLStyles.ShurikenHeaderCentered($"UnityEditor: {Application.unityVersion}, {DisplayVersionText.Replace("{0}", _package.version)}");
             EditorGUI.BeginChangeCheck();
             serializedObject.Update();
+            
             if (reader.objectReferenceValue == null && GUILayout.Button("Find VRSL GPUReadback Reader"))
             {
-                reader.objectReferenceValue = Object.FindObjectOfType<VRSL_GPUReadBack>();
+                reader.objectReferenceValue = FindObjectOfType<VRSL_GPUReadBack>();
             }
             EditorGUILayout.PropertyField(reader);
+            
             EditorGUILayout.Space(5);
+            
             EditorGUILayout.BeginHorizontal("box");
             EditorGUILayout.LabelField("Size", GUILayout.MaxWidth(50.0f));
             
             EditorGUI.BeginDisabledGroup(size.intValue <= 1);
             if (GUILayout.Button("-"))
             {
-                Mathf.Min(Mathf.Max(size.intValue--, 1), 512);
+                size.intValue = Mathf.Min(Mathf.Max(size.intValue--, 1), 512);
             }
             EditorGUI.EndDisabledGroup();
 
@@ -1155,19 +1113,19 @@ namespace VRSL.GPUReadBack
             EditorGUI.BeginDisabledGroup(size.intValue >= 512);
             if (GUILayout.Button("+"))
             {
-                Mathf.Min(Mathf.Max(size.intValue++, 1), 512);
+                size.intValue = Mathf.Min(Mathf.Max(size.intValue++, 1), 512);
             }
             EditorGUI.EndDisabledGroup();
-
+            
             EditorGUILayout.EndHorizontal();
+            
             EditorGUILayout.Space(5);
-            //testChannel.intValue = EditorGUILayout.IntSlider("Test Channel",testChannel.intValue, 1, 512);
-            //EditorGUILayout.PropertyField(extendedUniverseMode, Label("Extended Universe Mode"));
+            
             EditorGUILayout.BeginHorizontal();
             universalSmoothingStrength.floatValue = EditorGUILayout.Slider("Global Smoothing Strength",universalSmoothingStrength.floatValue, 0.0f, 1.0f);
-            if(GUILayout.Button("Apply To All"))
+            if (GUILayout.Button("Apply To All"))
             {
-                for(int i = 0; i < Mathf.Min(Mathf.Max(size.intValue, 1), 512); i++)
+                for (var i = 0; i < Mathf.Min(Mathf.Max(size.intValue, 1), 512); i++)
                 {
                     smoothingAmount.GetArrayElementAtIndex(i).floatValue = universalSmoothingStrength.floatValue;
                 }
@@ -1176,22 +1134,22 @@ namespace VRSL.GPUReadBack
             smoothingSpeed.floatValue = EditorGUILayout.Slider("Smoothing Speed (Lower = Faster)",smoothingSpeed.floatValue, 0.001f, 1.0f);
             EditorGUILayout.Space(15);
             VRSLStyles.GUILine(1);
-            //EditorGUILayout.Space(10);
-            var readbackfunctiotarget = (target as VRSL_ReadBackFunction);
-            for(int i = 0; i < Mathf.Min(Mathf.Max(size.intValue, 1), 512); i++)
+            
+            // TODO: implement pages (not everyone can render all 512 elements fast enough)
+            var readBackFunction = target as VRSL_ReadBackFunction;
+            for (var i = 0; i < Mathf.Min(Mathf.Max(size.intValue, 1), 512); i++)
             {
                 dataFoldout.GetArrayElementAtIndex(i).boolValue =
                     EditorGUILayout.BeginFoldoutHeaderGroup(dataFoldout.GetArrayElementAtIndex(i).boolValue,
-                        "Data Point #" + i);// VRSLStyles.Title1Foldout());
-                if(dataFoldout.GetArrayElementAtIndex(i).boolValue)
+                        $"{dmxUnviverses.GetArrayElementAtIndex(i).intValue}.{dmxChannels.GetArrayElementAtIndex(i).intValue} Data Point #{i}");// VRSLStyles.Title1Foldout());
+                if (dataFoldout.GetArrayElementAtIndex(i).boolValue)
                 {
-                    DrawElement(i, readbackfunctiotarget);
+                    DrawElement(i, readBackFunction);
                 }
                 EditorGUILayout.EndFoldoutHeaderGroup();
                 VRSLStyles.GUILine(1);
-                //EditorGUILayout.Space(10);
             }
-            Mathf.Min(Mathf.Max(size.intValue, 1), 512);
+            
             if (EditorGUI.EndChangeCheck())
             {
                 //Debug.Log("Found changes");
